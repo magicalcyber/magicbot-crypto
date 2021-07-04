@@ -4,8 +4,6 @@ import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.BinanceApiWebSocketClient;
 import com.binance.api.client.domain.OrderStatus;
-import com.binance.api.client.domain.account.Account;
-import com.binance.api.client.domain.account.AssetBalance;
 import com.binance.api.client.domain.account.NewOrder;
 import com.binance.api.client.domain.account.NewOrderResponse;
 import com.binance.api.client.domain.market.Candlestick;
@@ -33,7 +31,9 @@ public class Trader {
         BinanceApiRestClient restClient = factory.newRestClient();
 
         // Get balances
-        final TraderAccount account = new TraderAccount(restClient);
+        final TraderAccount account = new TraderAccount(restClient, config);
+        // show balance
+        account.printBalance();
 
         if (account.isNoCash()) {
             log.warn("Please refill USDT to your port");
@@ -56,14 +56,13 @@ public class Trader {
                             log.info(">>> BUY Signal@ " + e);
                             account.refreshBalance();
 
-                            Num amountUsdtToBuy = account.getBalanceUsdt().multipliedBy(config.getMarginLongPercent());
-                            DecimalNum closePrice = DecimalNum.valueOf(e.getClose());
-                            Num amountBtc = amountUsdtToBuy.dividedBy(closePrice);
+                            Num amountBtc = account.getAmountBtcToBuy(DecimalNum.valueOf(e.getClose()));
                             NewOrderResponse newOrderResponse = restClient.newOrder(NewOrder.marketBuy(config.getSymbol().toUpperCase(), amountBtc.toString()));
                             log.info(newOrderResponse.toString());
 
                             strategy.setInPosition(newOrderResponse.getStatus() == OrderStatus.FILLED);
                             account.refreshBalance();
+                            account.printBalance();
                             break;
                         }
                         case SELL: {
@@ -75,7 +74,10 @@ public class Trader {
 
                             if (newOrderResponse.getStatus() == OrderStatus.FILLED) {
                                 strategy.setInPosition(false);
+                                account.refreshBalance();
+                                account.printBalance();
                             }
+
                             break;
                         }
                         default: {
