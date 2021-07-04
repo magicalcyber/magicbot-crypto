@@ -62,7 +62,7 @@ public class TradeStrategy {
                 takeProfitPrice = barCurrent.getClosePrice().plus(
                         barCurrent.getClosePrice().multipliedBy(DecimalNum.valueOf(botConfig.getTakeProfitPercent())));
 
-                stopLossPrice = barCurrent.getClosePrice().minus(
+                stopLossPrice = barCurrent.getLowPrice().minus(
                         barCurrent.getClosePrice().multipliedBy(DecimalNum.valueOf(botConfig.getStopLossPercent())));
 
                 return TradeAction.BUY;

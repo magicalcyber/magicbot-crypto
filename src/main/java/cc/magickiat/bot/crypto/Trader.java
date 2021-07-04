@@ -49,7 +49,7 @@ public class Trader {
 
         BinanceApiWebSocketClient webSocketKLine = factory.newWebSocketClient();
         final Closeable closeable = webSocketKLine.onCandlestickEvent(config.getSymbol().toLowerCase(), config.getTimeframe(), e -> {
-                    log.debug(e.toString());
+                    log.debug(String.format("Candlestick: Open time: %s, Close price: %s", e.getOpenTime(), e.getClose()));
                     TradeAction action = strategy.onCandlestickEvent(e);
                     switch (action) {
                         case BUY: {
