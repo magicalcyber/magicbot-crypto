@@ -56,8 +56,8 @@ public class Trader {
                             log.info(">>> BUY Signal@ " + e);
                             account.refreshBalance();
 
-                            Num amountBtc = account.getAmountBtcToBuy(DecimalNum.valueOf(e.getClose()));
-                            NewOrderResponse newOrderResponse = restClient.newOrder(NewOrder.marketBuy(config.getSymbol().toUpperCase(), amountBtc.toString()));
+                            Num amount = account.getAmountToBuy(DecimalNum.valueOf(e.getClose()));
+                            NewOrderResponse newOrderResponse = restClient.newOrder(NewOrder.marketBuy(config.getSymbol().toUpperCase(), amount.toString()));
                             log.info(newOrderResponse.toString());
 
                             strategy.setInPosition(newOrderResponse.getStatus() == OrderStatus.FILLED);
@@ -69,7 +69,7 @@ public class Trader {
                             log.info(">>> SELL Signal@ " + e);
                             account.refreshBalance();
 
-                            NewOrderResponse newOrderResponse = restClient.newOrder(NewOrder.marketSell(config.getSymbol().toUpperCase(), account.getBalanceBtc().toString()));
+                            NewOrderResponse newOrderResponse = restClient.newOrder(NewOrder.marketSell(config.getSymbol().toUpperCase(), account.getBalanceEth().toString()));
                             log.info(newOrderResponse.toString());
 
                             if (newOrderResponse.getStatus() == OrderStatus.FILLED) {

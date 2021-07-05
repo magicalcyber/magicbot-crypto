@@ -15,7 +15,7 @@ public class TraderAccount {
 
     private final BinanceApiRestClient restClient;
     private final BotConfig config;
-    private AssetBalance balanceBtc;
+    private AssetBalance balanceEth;
     private AssetBalance balanceUsdt;
 
     public TraderAccount(BinanceApiRestClient restClient, BotConfig config) {
@@ -27,13 +27,13 @@ public class TraderAccount {
 
     public void refreshBalance() {
         Account account = restClient.getAccount();
-        balanceBtc = account.getAssetBalance("BTC");
+        balanceEth = account.getAssetBalance("ETH");
         balanceUsdt = account.getAssetBalance("USDT");
     }
 
     public void printBalance() {
         log.info("--------------------");
-        log.info("BTC: " + balanceBtc.getFree());
+        log.info("ETH: " + balanceEth.getFree());
         log.info("USDT: " + balanceUsdt.getFree());
         log.info("--------------------");
     }
@@ -42,15 +42,15 @@ public class TraderAccount {
         return new BigDecimal(balanceUsdt.getFree()).compareTo(BigDecimal.ZERO) < 1;
     }
 
-    public Num getBalanceBtc() {
-        return DecimalNum.valueOf(balanceBtc.getFree());
+    public Num getBalanceEth() {
+        return DecimalNum.valueOf(balanceEth.getFree());
     }
 
     public Num getBalanceUsdt() {
         return DecimalNum.valueOf(balanceUsdt.getFree());
     }
 
-    public Num getAmountBtcToBuy(Num closePrice) {
+    public Num getAmountToBuy(Num closePrice) {
         Num amountUsdtToBuy = getBalanceUsdt().multipliedBy(config.getMarginLongPercent());
         return amountUsdtToBuy.dividedBy(closePrice);
     }
